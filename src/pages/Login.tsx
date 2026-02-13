@@ -1,0 +1,72 @@
+import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
+
+export default function Login() {
+  const navigate = useNavigate();
+  const [formData, setFormData] = useState({ email: '', password: '' });
+  const [loading, setLoading] = useState(false);
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setLoading(true);
+    try {
+      // const res = await axios.post('/auth/login', formData);
+      
+      // MOCK for now
+      console.log("Logged in:", formData);
+      localStorage.setItem('token', 'mock-jwt-token');
+      
+      navigate('/dashboard');
+    } catch (error) {
+      alert("Login failed");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  return (
+    <div className="min-h-screen flex items-center justify-center bg-background">
+      <div className="bg-surface p-8 rounded shadow-md border border-border w-full max-w-md">
+        <div className="mb-6 text-center">
+          <h1 className="text-2xl font-bold text-dark">Sign In</h1>
+          <p className="text-sm text-dark-muted">Welcome back to CMaaS</p>
+        </div>
+        
+        <form onSubmit={handleSubmit} className="space-y-4">
+          <div>
+            <label className="block text-sm font-medium text-dark mb-1">Email</label>
+            <input 
+              type="email" 
+              required
+              className="w-full border-border rounded focus:ring-primary focus:border-primary text-sm p-2 border"
+              onChange={(e) => setFormData({...formData, email: e.target.value})}
+            />
+          </div>
+          <div>
+            <label className="block text-sm font-medium text-dark mb-1">Password</label>
+            <input 
+              type="password" 
+              required
+              className="w-full border-border rounded focus:ring-primary focus:border-primary text-sm p-2 border"
+              onChange={(e) => setFormData({...formData, password: e.target.value})}
+            />
+          </div>
+          
+          <button 
+            type="submit" 
+            disabled={loading}
+            className="w-full bg-primary hover:bg-primary-hover text-white font-medium py-2 rounded transition-colors disabled:opacity-50"
+          >
+            {loading ? 'Signing in...' : 'Sign In'}
+          </button>
+        </form>
+        
+        <div className="mt-4 text-center">
+          <p className="text-sm text-dark-muted">
+            Don't have an account? <a href="/register" className="text-primary hover:underline">Sign up</a>
+          </p>
+        </div>
+      </div>
+    </div>
+  );
+}
