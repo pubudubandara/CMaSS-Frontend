@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { login } from '../lib/auth';
 
 export default function Login() {
   const navigate = useNavigate();
@@ -10,12 +11,7 @@ export default function Login() {
     e.preventDefault();
     setLoading(true);
     try {
-      // const res = await axios.post('/auth/login', formData);
-      
-      // MOCK for now
-      console.log("Logged in:", formData);
-      localStorage.setItem('token', 'mock-jwt-token');
-      
+      await login(formData);
       navigate('/dashboard');
     } catch (error) {
       alert("Login failed");
