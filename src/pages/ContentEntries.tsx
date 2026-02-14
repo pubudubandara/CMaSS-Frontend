@@ -43,9 +43,7 @@ export default function ContentEntries() {
   const [totalRecords, setTotalRecords] = useState(0);
   const [totalPages, setTotalPages] = useState(0);
 
-  // --- 1. Dynamic Column Logic (THE FIX) ---
-  // If we have data, use the keys from the first item as headers.
-  // If no data, fallback to the schema definition.
+  // 1. Dynamic Column Logic
   const tableColumns = entries.length > 0 
     ? Object.keys(entries[0].data) 
     : contentType?.schema?.fields.map(f => f.name) || [];
@@ -159,7 +157,7 @@ export default function ContentEntries() {
     <div className="p-6">
       <div className="flex items-center justify-between mb-6">
         <div className="flex items-center gap-4">
-          <button onClick={() => navigate('/content-manager')} className="p-2 hover:bg-gray-100 rounded-lg">
+          <button onClick={() => navigate('/dashboard')} className="p-2 hover:bg-gray-100 rounded-lg">
             <ArrowLeft size={20} />
           </button>
           <div>

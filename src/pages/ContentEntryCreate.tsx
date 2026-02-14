@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { Save, ArrowLeft } from 'lucide-react';
+import { Save, ArrowLeft, Calendar, Type, Hash, ToggleLeft, FileText, List } from 'lucide-react';
 import api from '../lib/axios';
 
 interface ContentType {
@@ -14,56 +14,38 @@ interface ContentType {
   };
 }
 
-interface FormData {
-  [key: string]: any;
-}
-
 export default function ContentEntryCreate() {
-  const { contentTypeId, entryId } = useParams<{ contentTypeId: string; entryId?: string }>();
+  const { contentTypeId } = useParams(); 
   const navigate = useNavigate();
+  
   const [contentType, setContentType] = useState<ContentType | null>(null);
-  const [formData, setFormData] = useState<FormData>({});
+  const [formData, setFormData] = useState<Record<string, any>>({});
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
 
-  const isEdit = !!entryId;
-
   useEffect(() => {
-    if (contentTypeId) {
-      fetchContentType();
-    }
+    if (contentTypeId) fetchContentType();
   }, [contentTypeId]);
-
-  useEffect(() => {
-    if (isEdit && entryId) {
-      fetchEntry();
-    }
-  }, [entryId, isEdit]);
 
   const fetchContentType = async () => {
     try {
       const response = await api.get(`/ContentTypes/${contentTypeId}`);
       setContentType(response.data);
 
-      // Initialize form data with empty values
-      const initialData: FormData = {};
-      response.data.schema.fields.forEach((field: any) => {
-        initialData[field.name] = field.type === 'boolean' ? false : '';
+      // Initialize defaults for new entry
+      const initialData: Record<string, any> = {};
+      response.data.schema?.fields?.forEach((field: any) => {
+        if (field.type === 'boolean') initialData[field.name] = false;
+        else if (field.type === 'array') initialData[field.name] = [];
+        else initialData[field.name] = '';
       });
       setFormData(initialData);
+      
     } catch (error) {
       console.error('Failed to fetch content type:', error);
+      alert("Error loading schema");
     } finally {
       setLoading(false);
-    }
-  };
-
-  const fetchEntry = async () => {
-    try {
-      const response = await api.get(`/ContentEntries/${entryId}`);
-      setFormData(response.data.data);
-    } catch (error) {
-      console.error('Failed to fetch entry:', error);
     }
   };
 
@@ -80,170 +62,90 @@ export default function ContentEntryCreate() {
 
     try {
       const payload = {
-        data: formData,
-        contentTypeId: parseInt(contentTypeId!),
+        contentTypeId: Number(contentTypeId),
+        data: formData, 
       };
 
-      if (isEdit) {
-        await api.put(`/ContentEntries/${entryId}`, payload);
-      } else {
-        await api.post('/ContentEntries', payload);
-      }
-
+      await api.post('/ContentEntries', payload);
       navigate(`/content-manager/${contentTypeId}`);
+      
     } catch (error) {
-      console.error('Failed to save entry:', error);
-      alert('Failed to save entry');
+      console.error('Failed to create entry:', error);
+      alert('Failed to create entry. Check console.');
     } finally {
       setSaving(false);
     }
   };
 
+  // Render Helper
   const renderField = (field: { name: string; type: string }) => {
-    const value = formData[field.name] || '';
+    const value = formData[field.name] ?? ''; 
 
     switch (field.type) {
-      case 'text':
+      case 'string':
         return (
-          <input
-            type="text"
-            value={value}
-            onChange={(e) => handleInputChange(field.name, e.target.value)}
-            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-primary focus:border-primary"
-            placeholder={`Enter ${field.name}`}
-          />
-        );
-
-      case 'number':
-        return (
-          <input
-            type="number"
-            value={value}
-            onChange={(e) => handleInputChange(field.name, parseFloat(e.target.value) || 0)}
-            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-primary focus:border-primary"
-            placeholder={`Enter ${field.name}`}
-          />
-        );
-
-      case 'date':
-        return (
-          <input
-            type="date"
-            value={value ? new Date(value).toISOString().split('T')[0] : ''}
-            onChange={(e) => handleInputChange(field.name, e.target.value)}
-            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-primary focus:border-primary"
-          />
-        );
-
-      case 'boolean':
-        return (
-          <div className="flex items-center">
-            <input
-              type="checkbox"
-              checked={Boolean(value)}
-              onChange={(e) => handleInputChange(field.name, e.target.checked)}
-              className="h-4 w-4 text-primary focus:ring-primary border-gray-300 rounded"
-            />
-            <label className="ml-2 text-sm text-gray-700">
-              {value ? 'Yes' : 'No'}
-            </label>
+          <div className="relative">
+             <Type className="absolute left-3 top-2.5 text-gray-400" size={16} />
+             <input type="text" value={value} onChange={(e) => handleInputChange(field.name, e.target.value)} className="w-full pl-10 pr-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-primary focus:border-primary" placeholder="Enter text..." />
           </div>
         );
-
+      case 'number':
+        return (
+          <div className="relative">
+            <Hash className="absolute left-3 top-2.5 text-gray-400" size={16} />
+            <input type="number" value={value} onChange={(e) => handleInputChange(field.name, Number(e.target.value))} className="w-full pl-10 pr-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-primary focus:border-primary" placeholder="0" />
+          </div>
+        );
+      case 'datetime':
+        return <input type="datetime-local" value={value} onChange={(e) => handleInputChange(field.name, e.target.value)} className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-primary focus:border-primary" />;
+      case 'boolean':
+        return (
+          <label className="flex items-center cursor-pointer select-none">
+            <div className="relative">
+              <input type="checkbox" className="sr-only" checked={Boolean(value)} onChange={(e) => handleInputChange(field.name, e.target.checked)} />
+              <div className={`block w-10 h-6 rounded-full transition-colors ${value ? 'bg-primary' : 'bg-gray-300'}`}></div>
+              <div className={`dot absolute left-1 top-1 bg-white w-4 h-4 rounded-full transition-transform ${value ? 'transform translate-x-4' : ''}`}></div>
+            </div>
+            <div className="ml-3 text-sm font-medium text-gray-700">{value ? 'Yes' : 'No'}</div>
+          </label>
+        );
       case 'richtext':
-        return (
-          <textarea
-            value={value}
-            onChange={(e) => handleInputChange(field.name, e.target.value)}
-            rows={4}
-            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-primary focus:border-primary"
-            placeholder={`Enter ${field.name}`}
-          />
-        );
-
+        return <textarea value={value} onChange={(e) => handleInputChange(field.name, e.target.value)} rows={5} className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-primary focus:border-primary font-mono text-sm" />;
+      case 'array':
+        return <input type="text" value={Array.isArray(value) ? value.join(', ') : value} onChange={(e) => handleInputChange(field.name, e.target.value.split(',').map((s: string) => s.trim()))} className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-primary focus:border-primary" placeholder="Comma separated values" />;
       default:
-        return (
-          <input
-            type="text"
-            value={value}
-            onChange={(e) => handleInputChange(field.name, e.target.value)}
-            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-primary focus:border-primary"
-            placeholder={`Enter ${field.name}`}
-          />
-        );
+        return <input type="text" value={value} onChange={(e) => handleInputChange(field.name, e.target.value)} className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-primary focus:border-primary" />;
     }
   };
 
-  if (loading) {
-    return (
-      <div className="flex items-center justify-center h-64">
-        <div className="text-gray-500">Loading...</div>
-      </div>
-    );
-  }
-
-  if (!contentType) {
-    return (
-      <div className="flex items-center justify-center h-64">
-        <div className="text-gray-500">Content type not found</div>
-      </div>
-    );
-  }
+  if (loading) return <div className="p-10 text-center text-gray-500">Loading Schema...</div>;
+  if (!contentType) return <div className="p-10 text-center text-red-500">Content Type Not Found</div>;
 
   return (
-    <div className="p-6 max-w-2xl mx-auto">
-      <div className="flex items-center gap-4 mb-6">
-        <button
-          onClick={() => navigate(`/content-manager/${contentTypeId}`)}
-          className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
-        >
+    <div className="p-6 max-w-3xl mx-auto">
+      <div className="flex items-center gap-4 mb-8">
+        <button onClick={() => navigate(-1)} className="p-2 hover:bg-gray-100 rounded-lg transition-colors text-gray-600">
           <ArrowLeft size={20} />
         </button>
         <div>
-          <h1 className="text-2xl font-bold text-dark">
-            {isEdit ? 'Edit' : 'Create'} {contentType.name} Entry
-          </h1>
-          <p className="text-sm text-gray-500">
-            Fill in the details below
-          </p>
+          <h1 className="text-2xl font-bold text-dark">New {contentType.name}</h1>
+          <p className="text-sm text-gray-500">Create a new entry</p>
         </div>
       </div>
 
-      <form onSubmit={handleSubmit} className="bg-white border border-gray-200 rounded-lg p-6 space-y-6">
+      <form onSubmit={handleSubmit} className="bg-white border border-gray-200 rounded-xl shadow-sm p-8 space-y-6">
         {contentType.schema.fields.map((field) => (
           <div key={field.name}>
-            <label className="block text-sm font-medium text-dark mb-2 capitalize">
-              {field.name.replace(/([A-Z])/g, ' $1').trim()}
-              <span className={`ml-2 px-2 py-0.5 rounded text-xs ${
-                field.type === 'text' ? 'bg-blue-100 text-blue-700' :
-                field.type === 'number' ? 'bg-green-100 text-green-700' :
-                field.type === 'date' ? 'bg-purple-100 text-purple-700' :
-                field.type === 'boolean' ? 'bg-yellow-100 text-yellow-700' :
-                field.type === 'richtext' ? 'bg-indigo-100 text-indigo-700' :
-                'bg-gray-100 text-gray-700'
-              }`}>
-                {field.type}
-              </span>
+            <label className="block text-sm font-bold text-dark mb-2 capitalize flex items-center gap-2">
+              {field.name} <span className="px-2 py-0.5 rounded text-[10px] uppercase font-bold border bg-gray-50 text-gray-500 border-gray-100">{field.type}</span>
             </label>
             {renderField(field)}
           </div>
         ))}
-
-        <div className="flex justify-end gap-4 pt-4 border-t border-gray-200">
-          <button
-            type="button"
-            onClick={() => navigate(`/content-manager/${contentTypeId}`)}
-            className="px-4 py-2 text-gray-600 hover:bg-gray-100 rounded-lg transition-colors"
-          >
-            Cancel
-          </button>
-          <button
-            type="submit"
-            disabled={saving}
-            className="flex items-center gap-2 px-6 py-2 bg-primary text-white rounded-lg hover:bg-primary-hover transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-          >
-            <Save size={20} />
-            {saving ? 'Saving...' : 'Save Entry'}
+        <div className="flex justify-end gap-3 pt-6 border-t border-gray-100 mt-6">
+          <button type="button" onClick={() => navigate(-1)} className="px-5 py-2.5 text-gray-600 font-medium hover:bg-gray-100 rounded-lg transition-colors">Cancel</button>
+          <button type="submit" disabled={saving} className="flex items-center gap-2 px-6 py-2.5 bg-primary text-white rounded-lg hover:bg-primary-hover transition-colors disabled:opacity-50 shadow-sm font-bold">
+            <Save size={18} /> {saving ? 'Creating...' : 'Create Entry'}
           </button>
         </div>
       </form>
