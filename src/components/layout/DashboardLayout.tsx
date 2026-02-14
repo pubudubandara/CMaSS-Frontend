@@ -9,6 +9,7 @@ import {
   FileText,
   Users,
   Loader2,
+  Book,
 } from "lucide-react";
 import { Link, Outlet, useLocation, useNavigate } from "react-router-dom";
 import api from "../../lib/axios";
@@ -68,6 +69,10 @@ const STATIC_SIDEBAR_ITEMS: SidebarGroup[] = [
   {
     group: "Settings",
     items: [{ label: "Settings", path: "/settings", icon: Settings }],
+  },
+  {
+    group: "Help",
+    items: [{ label: "Documentation", path: "/documentation", icon: Book }],
   },
 ];
 

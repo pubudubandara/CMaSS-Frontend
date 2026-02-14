@@ -11,6 +11,7 @@ import DashboardHome from './pages/DashboardHome';
 import Settings from './pages/Settings';
 import ContentEntryEdit from './pages/ContentEntryEdit';
 import ContentTypeEdit from './pages/ContentTypeEdit';
+import Documentation from './pages/Documentation';
 
 function App() {
   return (
@@ -35,6 +36,7 @@ function App() {
           <Route path="content-manager/:contentTypeId/edit/:entryId" element={<ContentEntryEdit/>} />
           
           <Route path="settings" element={<Settings/>}/>
+          <Route path="documentation" element={<Documentation/>}/>
         </Route>
       </Routes>
     </Router>
