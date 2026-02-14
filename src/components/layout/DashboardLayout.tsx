@@ -51,8 +51,6 @@ const STATIC_SIDEBAR_ITEMS: SidebarGroup[] = [
         label: "Content Types",
         path: "/content-types",
         icon: Database,
-        hasButton: true,
-        buttonLabel: "+ Create",
       },
     ],
   },
