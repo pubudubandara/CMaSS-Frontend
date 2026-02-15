@@ -9,7 +9,7 @@ export default function Documentation() {
 
   const exampleCode = `
 // Example: Fetching Blog Posts (Content Type ID: 1)
-const response = await fetch('${BASE_URL}/ContentEntries/1?Page=1&PageSize=10', {
+const response = await fetch('${BASE_URL}/Delivery/1?Page=1&PageSize=10', {
   method: 'GET',
   headers: {
     'Content-Type': 'application/json',
@@ -67,7 +67,7 @@ console.log(data);
         <div className="bg-white border border-gray-200 rounded-lg p-6 shadow-sm">
           <div className="flex items-center gap-3 mb-3">
             <span className="bg-green-100 text-green-700 px-3 py-1 rounded font-bold text-xs uppercase">GET</span>
-            <code className="text-sm font-mono text-gray-800">/ContentEntries/{'{contentTypeId}'}</code>
+            <code className="text-sm font-mono text-gray-800">/Delivery/{'{contentTypeId}'}</code>
           </div>
           <p className="text-gray-600 mb-4">
             Retrieve a paginated list of entries for a specific content type.
@@ -85,7 +85,7 @@ console.log(data);
         <div className="bg-white border border-gray-200 rounded-lg p-6 shadow-sm">
           <div className="flex items-center gap-3 mb-3">
             <span className="bg-green-100 text-green-700 px-3 py-1 rounded font-bold text-xs uppercase">GET</span>
-            <code className="text-sm font-mono text-gray-800">/ContentEntries/entry/{'{entryId}'}</code>
+            <code className="text-sm font-mono text-gray-800">/Delivery/{'{contentTypeId}'}/{'{entryId}'}</code>
           </div>
           <p className="text-gray-600">
             Retrieve a single entry by its unique ID.
