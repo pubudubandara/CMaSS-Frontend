@@ -37,7 +37,7 @@ console.log(data);
           API Documentation
         </h1>
         <p className="mt-2 text-gray-600 text-lg">
-          Welcome to the CMaaS API. Use this guide to integrate your content into your website or app.
+          Welcome to the SchemaFlow API. Use this guide to integrate your content into your website or app.
         </p>
       </div>
 

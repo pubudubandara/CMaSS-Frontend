@@ -179,7 +179,7 @@ export default function DashboardLayout() {
             <Box size={20} className="text-white" />
           </div>
           <span className="font-bold text-lg tracking-tight">
-            CMaaS{" "}
+            SchemaFlow{" "}
             <span className="text-gray-500 text-xs font-normal">
               | Admin Console
             </span>
