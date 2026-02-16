@@ -5,11 +5,11 @@ export default function Documentation() {
   const [copied, setCopied] = useState(false);
 
   // Add your Backend URL here
-  const BASE_URL = "https://your-api-domain.com/api";
+  const BASE_URL = import.meta.env.VITE_BACKEND_URL ? `${import.meta.env.VITE_BACKEND_URL}/api` : "https://your-api-domain.com/api";
 
   const exampleCode = `
-// Example: Fetching Blog Posts (Content Type ID: 1)
-const response = await fetch('${BASE_URL}/Delivery/1?Page=1&PageSize=10', {
+// Example: Fetching all Blog Posts
+const response = await fetch('${BASE_URL}/Delivery/BlogPosts', {
   method: 'GET',
   headers: {
     'Content-Type': 'application/json',
@@ -19,6 +19,18 @@ const response = await fetch('${BASE_URL}/Delivery/1?Page=1&PageSize=10', {
 
 const data = await response.json();
 console.log(data);
+
+// Example: Fetching a specific Blog Post by ID
+const response2 = await fetch('${BASE_URL}/Delivery/BlogPosts/123', {
+  method: 'GET',
+  headers: {
+    'Content-Type': 'application/json',
+    'X-Api-Key': 'YOUR_API_KEY_HERE' // Get this from Settings
+  }
+});
+
+const post = await response2.json();
+console.log(post);
   `;
 
   const copyToClipboard = () => {
@@ -52,7 +64,7 @@ console.log(data);
           Pass this key in the request header.
         </p>
         <div className="bg-gray-50 p-4 rounded-lg border border-gray-200 font-mono text-sm text-gray-700">
-          X-Api-Key: sk_live_xxxxxxxxxxxx
+          X-Api-Key: cmaas__xxxxxxxxxxxx
         </div>
       </section>
 
@@ -67,7 +79,7 @@ console.log(data);
         <div className="bg-white border border-gray-200 rounded-lg p-6 shadow-sm">
           <div className="flex items-center gap-3 mb-3">
             <span className="bg-green-100 text-green-700 px-3 py-1 rounded font-bold text-xs uppercase">GET</span>
-            <code className="text-sm font-mono text-gray-800">/Delivery/{'{contentTypeId}'}</code>
+            <code className="text-sm font-mono text-gray-800">/Delivery/{'{contentTypeName}'}</code>
           </div>
           <p className="text-gray-600 mb-4">
             Retrieve a paginated list of entries for a specific content type.
@@ -85,7 +97,7 @@ console.log(data);
         <div className="bg-white border border-gray-200 rounded-lg p-6 shadow-sm">
           <div className="flex items-center gap-3 mb-3">
             <span className="bg-green-100 text-green-700 px-3 py-1 rounded font-bold text-xs uppercase">GET</span>
-            <code className="text-sm font-mono text-gray-800">/Delivery/{'{contentTypeId}'}/{'{entryId}'}</code>
+            <code className="text-sm font-mono text-gray-800">/Delivery/{'{contentTypeName}'}/{'{id}'}</code>
           </div>
           <p className="text-gray-600">
             Retrieve a single entry by its unique ID.
